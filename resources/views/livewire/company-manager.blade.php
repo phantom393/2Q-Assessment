@@ -25,8 +25,18 @@
                         <input type="email" wire:model.defer="email" placeholder="Email" class="form-control mb-1">
                         @error('email') <small class="text-danger">{{ $message }}</small> @enderror
 
-                        <input type="text" wire:model.defer="logo" placeholder="Logo URL" class="form-control mb-1">
-                        @error('logo') <small class="text-danger">{{ $message }}</small> @enderror
+                        <input type="file" wire:model="logoFile" class="form-control mb-1">
+                        @error('logoFile') <small class="text-danger">{{ $message }}</small> @enderror
+
+                        @if ($logoFile)
+                            <div class="mb-2">
+                                <img src="{{ $logoFile->temporaryUrl() }}" alt="Logo Preview" class="img-thumbnail" style="max-height: 150px;">
+                            </div>
+                        @elseif ($isEditing && $logo)
+                            <div class="mb-2">
+                                <img src="{{ $logo }}" alt="Current Logo" class="img-thumbnail" style="max-height: 150px;">
+                            </div>
+                        @endif
 
                         <input type="text" wire:model.defer="website_link" placeholder="Website Link" class="form-control mb-1">
                         @error('website_link') <small class="text-danger">{{ $message }}</small> @enderror

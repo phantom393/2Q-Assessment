@@ -4,9 +4,13 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Company;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
 
 class CompanyManager extends Component
 {
+    use WithFileUploads;
+
     public $companies;
     public $companyId;
     public $name;
@@ -14,6 +18,7 @@ class CompanyManager extends Component
     public $logo;
     public $website_link;
     public $isEditing = false;
+    public $logoFile;
 
     public function mount()
     {
@@ -50,14 +55,16 @@ class CompanyManager extends Component
         $this->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'logo' => 'required|string',
+            'logoFile' => 'required|image|max:1024',
             'website_link' => 'required|url',
         ]);
+
+        $logoPath = $this->logoFile->store('logos', 'public');
 
         Company::create([
             'name' => $this->name,
             'email' => $this->email,
-            'logo' => $this->logo,
+            'logo' => Storage::url($logoPath),
             'website_link' => $this->website_link,
         ]);
 
@@ -65,28 +72,36 @@ class CompanyManager extends Component
         $this->loadCompanies();
         $this->dispatch('close-modal');
     }
+
 
     public function update()
-    {
-        $this->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'logo' => 'required|string',
-            'website_link' => 'required|url',
-        ]);
+{
+    $this->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'website_link' => 'required|url',
+        'logoFile' => 'nullable|image|max:1024',
+    ]);
 
-        $company = Company::findOrFail($this->companyId);
-        $company->update([
-            'name' => $this->name,
-            'email' => $this->email,
-            'logo' => $this->logo,
-            'website_link' => $this->website_link,
-        ]);
+    $company = Company::findOrFail($this->companyId);
 
-        $this->resetForm();
-        $this->loadCompanies();
-        $this->dispatch('close-modal');
+    $logoUrl = $company->logo;
+    if ($this->logoFile) {
+        $logoPath = $this->logoFile->store('logos', 'public');
+        $logoUrl = Storage::url($logoPath);
     }
+
+    $company->update([
+        'name' => $this->name,
+        'email' => $this->email,
+        'logo' => $logoUrl,
+        'website_link' => $this->website_link,
+    ]);
+
+    $this->resetForm();
+    $this->loadCompanies();
+    $this->dispatch('close-modal');
+}
 
     public function delete($id)
     {
@@ -95,9 +110,9 @@ class CompanyManager extends Component
     }
 
     private function resetForm()
-    {
-        $this->reset(['companyId', 'name', 'email', 'logo', 'website_link']);
-    }
+{
+    $this->reset(['companyId', 'name', 'email', 'logoFile', 'logo', 'website_link']);
+}
 
     public function submit() 
 {
