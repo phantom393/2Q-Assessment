@@ -2,7 +2,6 @@
     <!-- <h1 class="text-xl font-semibold">Dashboard</h1> -->
     <div>
         <!-- Logged in as: {{ Auth::guard('admin')->user()->name }} -->
-         bawah
         <livewire:admin-logout />
     </div>
 </header>

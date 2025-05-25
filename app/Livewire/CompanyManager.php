@@ -6,34 +6,27 @@ use Livewire\Component;
 use App\Models\Company;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
+use Livewire\WithPagination;
 
 class CompanyManager extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, WithPagination;
 
-    public $companies;
     public $companyId;
     public $name;
     public $email;
-    public $logo;
-    public $website_link;
+    public $logo;       
+    public $websiteLink;
     public $isEditing = false;
     public $logoFile;
-
-    public function mount()
-    {
-        $this->loadCompanies();
-    }
-
-    public function loadCompanies()
-    {
-        $this->companies = Company::latest()->get();
-    }
+    public $search;
+    protected $paginationTheme = 'bootstrap';
 
     public function create()
     {
         $this->resetForm();
-        $this->isEditing = false;
         $this->dispatch('open-modal');
     }
 
@@ -43,8 +36,8 @@ class CompanyManager extends Component
         $this->companyId = $company->id;
         $this->name = $company->name;
         $this->email = $company->email;
-        $this->logo = $company->logo;
-        $this->website_link = $company->website_link;
+        $this->logo = $company->logo; 
+        $this->websiteLink = $company->website_link;
         $this->isEditing = true;
 
         $this->dispatch('open-modal');
@@ -53,10 +46,10 @@ class CompanyManager extends Component
     public function store()
     {
         $this->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'logoFile' => 'required|image|max:1024',
-            'website_link' => 'required|url',
+            'name' => 'required|unique:companies',
+            'email' => 'required|email|unique:companies',
+            'logoFile' => 'required|image|mimes:jpg,jpeg,png|max:1024|dimensions:min_width=100,min_height=100',
+            'websiteLink' => 'required|url',
         ]);
 
         $logoPath = $this->logoFile->store('logos', 'public');
@@ -64,67 +57,112 @@ class CompanyManager extends Component
         Company::create([
             'name' => $this->name,
             'email' => $this->email,
-            'logo' => Storage::url($logoPath),
-            'website_link' => $this->website_link,
+            'logo' => $logoPath,   
+            'website_link' => $this->websiteLink,
         ]);
 
         $this->resetForm();
-        $this->loadCompanies();
+        $this->dispatch('close-modal');
+
+        LivewireAlert::title('Company stored successfully.')
+            ->success()
+            ->withConfirmButton('Ok')
+            ->show();
+    }
+
+    public function update()
+    {
+        $this->validate([
+            'name' => [
+                'required',
+                Rule::unique('companies', 'name')
+                    ->ignore($this->companyId)
+                    ->whereNull('deleted_at'),
+            ],
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('companies', 'email')
+                    ->ignore($this->companyId)
+                    ->whereNull('deleted_at'),
+            ],
+            'logoFile' => 'nullable|image|mimes:jpg,jpeg,png|max:1024|dimensions:min_width=100,min_height=100',
+            'websiteLink' => 'required|url',
+        ]);
+
+        $company = Company::findOrFail($this->companyId);
+
+        $logoPath = $company->logo;
+
+        if ($this->logoFile) {
+            $logoPath = $this->logoFile->store('logos', 'public');
+        }
+
+        $company->update([
+            'name' => $this->name,
+            'email' => $this->email,
+            'logo' => $logoPath, 
+            'website_link' => $this->websiteLink,
+        ]);
+
+        $this->resetForm();
+        $this->dispatch('close-modal');
+
+        LivewireAlert::title('Company updated successfully.')
+            ->success()
+            ->withConfirmButton('Ok')
+            ->show();
+    }
+
+    public function confirmDelete($id)
+    {
+        LivewireAlert::title('Delete Item')
+            ->text('Are you sure you want to delete this item?')
+            ->asConfirm()
+            ->onConfirm('deleteItem', ['id' => $id])
+            ->onDeny('keepItem')
+            ->show();
+    }
+
+    public function deleteItem($id)
+    {
+        Company::destroy($id['id']);
+
+        LivewireAlert::title('Company deleted successfully.')
+            ->success()
+            ->withConfirmButton('Ok')
+            ->show();
+    }
+
+    public function keepItem()
+    {
         $this->dispatch('close-modal');
     }
 
-
-    public function update()
-{
-    $this->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'website_link' => 'required|url',
-        'logoFile' => 'nullable|image|max:1024',
-    ]);
-
-    $company = Company::findOrFail($this->companyId);
-
-    $logoUrl = $company->logo;
-    if ($this->logoFile) {
-        $logoPath = $this->logoFile->store('logos', 'public');
-        $logoUrl = Storage::url($logoPath);
-    }
-
-    $company->update([
-        'name' => $this->name,
-        'email' => $this->email,
-        'logo' => $logoUrl,
-        'website_link' => $this->website_link,
-    ]);
-
-    $this->resetForm();
-    $this->loadCompanies();
-    $this->dispatch('close-modal');
-}
-
-    public function delete($id)
-    {
-        Company::destroy($id);
-        $this->loadCompanies();
-    }
-
     private function resetForm()
-{
-    $this->reset(['companyId', 'name', 'email', 'logoFile', 'logo', 'website_link']);
-}
-
-    public function submit() 
-{
-    if ($this->isEditing) {
-        $this->update();
-    } else {
-        $this->store();
+    {
+        $this->reset(['companyId', 'name', 'email', 'logoFile', 'logo', 'websiteLink']);
+        $this->isEditing = false;
     }
-}
+
+    public function submit()
+    {
+        if ($this->isEditing) {
+            $this->update();
+        } else {
+            $this->store();
+        }
+    }
 
     public function render()
     {
-        return view('livewire.company-manager');
+        $searchWords = '%'.$this->search.'%';
+
+        return view('livewire.company-manager', [
+            'companies' => Company::where('name', 'like', $searchWords)
+                ->orWhere('website_link', 'like', $searchWords)
+                ->latest()
+                ->paginate(2),
+        ]);
     }
 }

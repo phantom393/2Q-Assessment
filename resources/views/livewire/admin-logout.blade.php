@@ -1,5 +1,5 @@
 <div>
-   <button wire:click="logout" class="btn btn-outline-danger">
+   <button wire:click="confirmLogout" class="btn btn-outline-primary" style="color:black; font-size: 12px;">
     Logout
-</button>
+    </button>
 </div>
