@@ -83,8 +83,8 @@
                                     Actions
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" wire:click.prevent="edit('{{ $company->id }}')" href="#">Edit</a></li>
-                                    <li><a class="dropdown-item text-danger" wire:click.prevent="confirmDelete('{{ $company->id }}')" href="#">Delete</a></li>
+                                    <li><a class="dropdown-item" style="font-size: 12px;" wire:click.prevent="edit('{{ $company->id }}')" href="#">Edit</a></li>
+                                    <li><a class="dropdown-item text-danger" style="font-size: 12px;" wire:click.prevent="confirmDelete('{{ $company->id }}')" href="#">Delete</a></li>
                                 </ul>
                             </div>
                         </td>
