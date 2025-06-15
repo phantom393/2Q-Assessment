@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
