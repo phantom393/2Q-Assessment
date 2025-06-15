@@ -22,13 +22,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if (app()->environment('local')) {
-            URL::forceScheme('https');
+            \Illuminate\Support\Facades\URL::forceScheme('https');
 
-            // Set custom script route for Livewire when using ngrok
-            FrontendAssets::use(function () {
-                return [
-                    'js' => 'https://624d-118-101-168-70.ngrok-free.app/livewire/livewire.js',
-                ];
+            // This will tell Livewire where to load its script from (your ngrok URL)
+            Livewire::setScriptRoute(function () {
+                return 'https://624d-118-101-168-70.ngrok-free.app/livewire/livewire.js';
             });
         }
     }
