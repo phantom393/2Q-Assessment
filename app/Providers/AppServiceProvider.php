@@ -20,8 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (app()->environment('local')) {
-            Livewire::setScriptRoute(fn () => 'https://a605-118-101-168-70.ngrok-free.app/livewire/livewire.js');
-        }
+        // if (app()->environment('local')) {
+        //     Livewire::setScriptRoute(fn () => 'https://a605-118-101-168-70.ngrok-free.app/livewire/livewire.js');
+        // }
     }
 }

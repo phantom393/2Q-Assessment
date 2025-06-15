@@ -2,7 +2,7 @@
     <div wire:ignore.self class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form wire:submit.prevent="submit">
+                <form wire:submit.prevent="submit" enctype="multipart/form-data">
                     <div class="modal-header">
                         <h5 class="modal-title" id="companyModalLabel">
                             {{ $isEditing ? 'Edit Company' : 'Add Company' }}
