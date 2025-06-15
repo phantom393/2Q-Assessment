@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Log;
 
 class CompanyManager extends Component
 {
@@ -45,8 +46,8 @@ class CompanyManager extends Component
 
     public function store()
     {
-         \Log::info('logoFile in store():', ['value' => $this->logoFile]);
-         
+         Log::info('logoFile in store():', ['value' => $this->logoFile]);
+
         $this->validate([
             'name' => 'required|unique:companies',
             'email' => 'required|email|unique:companies',
