@@ -3,7 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
+use Illuminate\Support\Facades\URL;
+use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,8 +21,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // if (app()->environment('local')) {
-        //     Livewire::setScriptRoute(fn () => 'https://a605-118-101-168-70.ngrok-free.app/livewire/livewire.js');
-        // }
+        if (app()->environment('local')) {
+            URL::forceScheme('https');
+
+            // Set custom script route for Livewire when using ngrok
+            FrontendAssets::use(function () {
+                return [
+                    'js' => 'https://624d-118-101-168-70.ngrok-free.app/livewire/livewire.js',
+                ];
+            });
+        }
     }
 }
