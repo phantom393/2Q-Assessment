@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 // use Livewire\Livewire;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
-        // Livewire::usePaginationTheme('bootstrap');
+        if (app()->environment('local')) {
+            Livewire::setScriptRoute(function () {
+                return 'https://a605-118-101-168-70.ngrok-free.app/livewire/livewire.js';
+            });
+        }
     }
 }
