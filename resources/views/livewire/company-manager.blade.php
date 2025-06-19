@@ -3,7 +3,6 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <form wire:submit.prevent="submit" enctype="multipart/form-data">
-                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="companyModalLabel">
                             {{ $isEditing ? 'Edit Company' : 'Add Company' }}

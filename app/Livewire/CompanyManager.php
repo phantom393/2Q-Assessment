@@ -46,8 +46,6 @@ class CompanyManager extends Component
 
     public function store()
     {
-         Log::info('logoFile in store1ianin():', ['value' => $this->logoFile]);
-
         $this->validate([
             'name' => 'required|unique:companies',
             'email' => 'required|email|unique:companies',
